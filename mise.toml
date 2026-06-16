@@ -1,0 +1,8 @@
+[tools]
+ruby = "4.0.5"
+node = "22.13.1"
+
+
+[tasks.server]
+run = "bundle exec rails server"
+alias = "s"
