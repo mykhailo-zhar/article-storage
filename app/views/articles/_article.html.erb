@@ -1,0 +1,32 @@
+<div id="<%= dom_id article %>">
+  <div>
+    <strong>Title:</strong>
+    <%= article.title %>
+  </div>
+
+  <div>
+    <strong>Excerpt:</strong>
+    <%= article.excerpt %>
+  </div>
+
+  <div>
+    <strong>Wordpress url:</strong>
+    <%= article.wordpress_url %>
+  </div>
+
+  <div>
+    <strong>Wordpress:</strong>
+    <%= article.wordpress_id %>
+  </div>
+
+  <div>
+    <strong>Published at:</strong>
+    <%= article.published_at %>
+  </div>
+
+  <div>
+    <strong>Categories:</strong>
+    <%= article.categories.map(&:name).join(", ") %>
+  </div>
+
+</div>
