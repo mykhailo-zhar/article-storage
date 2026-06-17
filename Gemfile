@@ -67,6 +67,7 @@ group :development do
   gem "web-console"
   gem "ruby-lsp", require: false
   gem "ruby-lsp-rspec", require: false
+  gem "annotaterb"
 end
 
 group :test do
