@@ -7,6 +7,13 @@
 # Ignore bundler config.
 /.bundle
 
+# Ignore personal files.
+.personal/*
+
+# Ignore gem files.
+/vendor/bundle/*
+!/vendor/bundle/.keep
+
 # Ignore all environment files.
 /.env*
 
