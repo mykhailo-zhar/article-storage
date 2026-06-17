@@ -1,3 +1,20 @@
+# == Schema Information
+#
+# Table name: articles
+#
+#  id            :integer          not null, primary key
+#  excerpt       :text
+#  published_at  :datetime
+#  title         :string
+#  wordpress_url :string
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  wordpress_id  :integer
+#
+# Indexes
+#
+#  index_articles_on_wordpress_id  (wordpress_id) UNIQUE
+#
 FactoryBot.define do
   factory :article do
     title { Faker::Lorem.sentence }
