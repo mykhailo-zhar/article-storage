@@ -9,6 +9,9 @@
 
 # Ignore personal files.
 .personal/*
+mise.local.toml
+*.code-workspace
+.cursorignore
 
 # Ignore gem files.
 /vendor/bundle/*
@@ -39,4 +42,3 @@
 
 # Ignore key files for decrypting credentials and more.
 /config/*.key
-
