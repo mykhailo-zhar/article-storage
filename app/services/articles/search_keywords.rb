@@ -97,7 +97,7 @@ module Articles
         page: page,
         status: STATUS,
         _fields: FIELDS,
-        q: search_query
+        search: search_query
       }
 
       category_ids = resolved_category_ids

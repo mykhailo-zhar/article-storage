@@ -22,7 +22,7 @@ RSpec.describe "articles/index", type: :view do
     render
 
     assert_select "form[action=?][method=get]", articles_path
-    assert_select "input[name=q][value=?]", "MVP"
+    assert_select "input[name=search][value=?]", "MVP"
     assert_select "input[name='categories[]'][checked=checked][value=idea]"
     assert_select "input[type=submit][value=?]", "Search"
   end

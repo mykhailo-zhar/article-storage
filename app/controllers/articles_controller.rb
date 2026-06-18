@@ -6,7 +6,7 @@ class ArticlesController < ApplicationController
 
   # GET /articles or /articles.json
   def index
-    @search_query = params[:q].to_s
+    @search_query = params[:search].to_s
     @selected_categories = Array(params[:categories]).map(&:to_sym)
     @page = [ params[:page].to_i, 1 ].max
 

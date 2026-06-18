@@ -9,8 +9,8 @@
 
 <%= form_with url: articles_path, method: :get, local: true do |form| %>
   <div>
-    <%= label_tag :q, "What are you looking for?" %>
-    <%= text_field_tag :q, @search_query %>
+    <%= label_tag :search, "What are you looking for?" %>
+    <%= text_field_tag :search, @search_query %>
   </div>
 
   <fieldset>
@@ -42,7 +42,7 @@
     <div class="pagination__controls">
       <% if @page > 1 %>
         <%= link_to "Previous",
-              articles_path(q: @search_query, categories: @selected_categories, page: @page - 1),
+              articles_path(search: @search_query, categories: @selected_categories, page: @page - 1),
               class: "pagination__button" %>
       <% end %>
 
@@ -50,7 +50,7 @@
 
       <% if @articles.size == 12 %>
         <%= link_to "Next",
-              articles_path(q: @search_query, categories: @selected_categories, page: @page + 1),
+              articles_path(search: @search_query, categories: @selected_categories, page: @page + 1),
               class: "pagination__button" %>
       <% end %>
     </div>

@@ -25,7 +25,7 @@ RSpec.describe "/articles", type: :request do
     end
 
     it "calls SearchKeywords with search params" do
-      get articles_url, params: { q: "MVP", categories: [ "idea" ], page: "2" }
+      get articles_url, params: { search: "MVP", categories: [ "idea" ], page: "2" }
 
       expect(Articles::SearchKeywords).to have_received(:call).with(
         search_query: "MVP",
