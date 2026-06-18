@@ -24,6 +24,19 @@ RSpec.describe Article, type: :model do
     expect(subject).to be_valid
   end
 
+  describe 'wordpress_url validation' do
+    it 'accepts https URLs' do
+      subject.wordpress_url = 'https://example.com/post'
+      expect(subject).to be_valid
+    end
+
+    it 'rejects javascript URLs' do
+      subject.wordpress_url = 'javascript:alert(1)'
+      expect(subject).not_to be_valid
+      expect(subject.errors[:wordpress_url]).to include('must be a valid http or https URL')
+    end
+  end
+
   describe 'categories' do
     let(:category) { FactoryBot.create(:category) }
     let(:article) { FactoryBot.create(:article, categories: [ category ]) }

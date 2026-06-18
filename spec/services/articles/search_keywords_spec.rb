@@ -14,12 +14,69 @@ RSpec.describe Articles::SearchKeywords do
     )
   end
 
-  def stub_wordpress_response(status:, body:)
+  def build_wordpress_response(status:, body:)
     response_class = Net::HTTPResponse::CODE_TO_OBJ[status.to_s]
     response = response_class.new("1.1", status.to_s, "Message")
     response.instance_variable_set(:@body, body)
     response.instance_variable_set(:@read, true)
-    allow(Net::HTTP).to receive(:get_response).and_return(response)
+    response
+  end
+
+  def stub_wordpress_response(status:, body:)
+    allow(Net::HTTP).to receive(:get_response).and_return(build_wordpress_response(status: status, body: body))
+  end
+
+  def capture_request_query(service)
+    captured_uri = nil
+
+    allow(Net::HTTP).to receive(:get_response) do |uri|
+      captured_uri = uri
+      build_wordpress_response(status: 200, body: [].to_json)
+    end
+
+    service.call
+    URI.decode_www_form(captured_uri.query).to_h
+  end
+
+  describe "request query params" do
+    it "omits categories from the request when categories are empty" do
+      service = described_class.new(
+        search_query: "MVP",
+        categories: [],
+        url: api_url,
+        blog_url: blog_url
+      )
+
+      query = capture_request_query(service)
+
+      expect(query).not_to have_key("categories")
+    end
+
+    it "includes categories in the request when categories are present" do
+      service = described_class.new(
+        search_query: "MVP",
+        categories: [ :idea ],
+        url: api_url,
+        blog_url: blog_url
+      )
+
+      query = capture_request_query(service)
+
+      expect(query["categories"]).to eq("881417")
+    end
+
+    it "omits categories from the request when only :all is selected" do
+      service = described_class.new(
+        search_query: "MVP",
+        categories: [ :all ],
+        url: api_url,
+        blog_url: blog_url
+      )
+
+      query = capture_request_query(service)
+
+      expect(query).not_to have_key("categories")
+    end
   end
 
   describe "#call" do

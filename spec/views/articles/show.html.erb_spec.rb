@@ -4,17 +4,17 @@ RSpec.describe "articles/show", type: :view do
   before(:each) do
     assign(:article, Article.create!(
       title: "Title",
-      excerpt: "MyText",
-      wordpress_url: "Wordpress Url",
+      excerpt: "<p>MyText</p>",
+      wordpress_url: "https://example.com/post",
       wordpress_id: 2
     ))
   end
 
-  it "renders attributes in <p>" do
+  it "renders article attributes" do
     render
-    expect(rendered).to match(/Title/)
-    expect(rendered).to match(/MyText/)
-    expect(rendered).to match(/Wordpress Url/)
-    expect(rendered).to match(/2/)
+    expect(rendered).to include("Title")
+    expect(rendered).to include("<p>MyText</p>")
+    expect(rendered).to have_css(".article")
+    expect(rendered).to have_css(".article__title", text: "Title")
   end
 end
