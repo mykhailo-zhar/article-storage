@@ -14,9 +14,17 @@ RSpec.describe "/articles", type: :request do
   ]
   end
 
+  let(:search_service) do
+    instance_double(
+      Articles::SearchKeywords,
+      call: search_result,
+      total_pages: 3
+    )
+  end
+
   describe "GET /index" do
     before do
-      allow(Articles::SearchKeywords).to receive(:call).and_return(search_result)
+      allow(Articles::SearchKeywords).to receive(:new).and_return(search_service)
     end
 
     it "renders a successful response" do
@@ -27,7 +35,7 @@ RSpec.describe "/articles", type: :request do
     it "calls SearchKeywords with search params" do
       get articles_url, params: { search: "MVP", categories: [ "idea" ], page: "2" }
 
-      expect(Articles::SearchKeywords).to have_received(:call).with(
+      expect(Articles::SearchKeywords).to have_received(:new).with(
         search_query: "MVP",
         categories: [ :idea ],
         page: 2
@@ -37,7 +45,7 @@ RSpec.describe "/articles", type: :request do
     it "calls SearchKeywords with defaults when params are absent" do
       get articles_url
 
-      expect(Articles::SearchKeywords).to have_received(:call).with(
+      expect(Articles::SearchKeywords).to have_received(:new).with(
         search_query: "",
         categories: [],
         page: 1
@@ -46,7 +54,7 @@ RSpec.describe "/articles", type: :request do
 
     context "when SearchKeywords raises an error" do
       before do
-        allow(Articles::SearchKeywords).to receive(:call).and_raise(
+        allow(search_service).to receive(:call).and_raise(
           RuntimeError, "WordPress API request failed (500): unavailable"
         )
       end

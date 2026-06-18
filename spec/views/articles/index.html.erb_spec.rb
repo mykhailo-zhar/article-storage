@@ -61,6 +61,7 @@ RSpec.describe "articles/index", type: :view do
   end
 
   it "renders centered pagination when more pages are available" do
+    assign(:total_pages, 3)
     assign(:articles, Array.new(12) do |index|
       Article.new(
         title: "Article #{index}",
@@ -72,7 +73,14 @@ RSpec.describe "articles/index", type: :view do
     render
 
     assert_select "nav.pagination[aria-label=?]", "Articles pagination"
-    assert_select ".pagination__current", text: "Page 1"
+    assert_select "form.pagination__page-form[action=?][method=get]", articles_path
+    assert_select "input[name=search][value=?]", "MVP"
+    assert_select "input[name='categories[]'][value=idea]"
+    assert_select "input#page[name=page][type=number][value=?]", "1"
+    assert_select "input#page[min=?]", "1"
+    assert_select "input#page[max=?]", "3"
+    assert_select ".pagination__current", text: /of 3/
+    assert_select "input[type=submit][value=?]", "Go"
     assert_select "a.pagination__button", text: "Next"
     assert_select "a.pagination__button", text: "Previous", count: 0
   end
