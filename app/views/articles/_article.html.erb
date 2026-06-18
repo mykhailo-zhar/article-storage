@@ -7,10 +7,12 @@
   </div>
 
   <dl class="article__meta">
+    <% if article.published_at.present? %>
     <div class="article__meta-item">
-      <dt class="article__meta-label">Published at</dt>
-      <dd class="article__meta-value"><%= article.published_at.strftime("%B %d, %Y") %></dd>
-    </div>
+        <dt class="article__meta-label">Published at</dt>
+        <dd class="article__meta-value"><%= article.published_at.strftime("%B %d, %Y") %></dd>
+      </div>
+    <% end %>
 
     <div class="article__meta-item">
       <dt class="article__meta-label">Categories</dt>
@@ -25,10 +27,6 @@
   </dl>
 
   <div class="article__actions">
-    <% if article.persisted? %>
-      <%= link_to "Show this article", article, class: "article__link" %>
-    <% elsif article.wordpress_url.present? %>
-      <%= link_to "View the blog post", article.wordpress_url, target: "_blank", rel: "noopener", class: "article__link" %>
-    <% end %>
+    <%= link_to "View the blog post", article.wordpress_url, target: "_blank", rel: "noopener", class: "article__link" %>
   </div>
 </div>
