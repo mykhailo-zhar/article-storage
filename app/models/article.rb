@@ -3,6 +3,7 @@
 # Table name: articles
 #
 #  id            :integer          not null, primary key
+#  embedding     :binary(384)
 #  excerpt       :text
 #  published_at  :datetime
 #  title         :string
@@ -16,6 +17,8 @@
 #  index_articles_on_wordpress_id  (wordpress_id) UNIQUE
 #
 class Article < ApplicationRecord
+  has_neighbors :embedding, dimensions: 384
+
   has_many :article_categories, dependent: :destroy
   has_many :categories, through: :article_categories
 
