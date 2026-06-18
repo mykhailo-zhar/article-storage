@@ -1,32 +1,34 @@
-<div id="<%= dom_id article %>">
-  <div>
-    <strong>Title:</strong>
-    <%= article.title %>
+<div id="<%= dom_id article %>" class="article">
+  <div class="article__header">
+    <h2 class="article__title"><%= article.title %></h2>
+    <div class="article__excerpt">
+      <%= sanitize article.excerpt %>
+    </div>
   </div>
 
-  <div>
-    <strong>Excerpt:</strong>
-    <%= article.excerpt %>
-  </div>
+  <dl class="article__meta">
+    <div class="article__meta-item">
+      <dt class="article__meta-label">Published at</dt>
+      <dd class="article__meta-value"><%= article.published_at.strftime("%B %d, %Y") %></dd>
+    </div>
 
-  <div>
-    <strong>Wordpress url:</strong>
-    <%= article.wordpress_url %>
-  </div>
+    <div class="article__meta-item">
+      <dt class="article__meta-label">Categories</dt>
+      <dd class="article__meta-value">
+        <div class="article__categories">
+          <% article.categories.each do |category| %>
+            <span class="article__category-badge"><%= category.name %></span>
+          <% end %>
+        </div>
+      </dd>
+    </div>
+  </dl>
 
-  <div>
-    <strong>Wordpress:</strong>
-    <%= article.wordpress_id %>
+  <div class="article__actions">
+    <% if article.persisted? %>
+      <%= link_to "Show this article", article, class: "article__link" %>
+    <% elsif article.wordpress_url.present? %>
+      <%= link_to "View the blog post", article.wordpress_url, target: "_blank", rel: "noopener", class: "article__link" %>
+    <% end %>
   </div>
-
-  <div>
-    <strong>Published at:</strong>
-    <%= article.published_at %>
-  </div>
-
-  <div>
-    <strong>Categories:</strong>
-    <%= article.categories.map(&:name).join(", ") %>
-  </div>
-
 </div>
