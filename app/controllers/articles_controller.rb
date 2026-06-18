@@ -10,19 +10,23 @@ class ArticlesController < ApplicationController
     @selected_categories = Array(params[:categories]).map(&:to_sym)
     @page = [ params[:page].to_i, 1 ].max
 
-    @articles = Articles::SearchKeywords.call(
+    search_keywords = Articles::SearchKeywords.new(
       search_query: @search_query,
       categories: @selected_categories,
       page: @page
     )
 
+    @articles = search_keywords.call
+    @total_pages = search_keywords.total_pages
+
     respond_to do |format|
       format.html
-      format.json { render json: @articles }
+      format.json { render json: { articles: @articles, total_pages: @total_pages } }
     end
   rescue RuntimeError => e
     flash.now[:alert] = e.message
     @articles = []
+    @total_pages = 0
   end
 
   # GET /articles/1 or /articles/1.json
