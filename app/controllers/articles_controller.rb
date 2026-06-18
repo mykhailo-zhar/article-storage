@@ -6,7 +6,18 @@ class ArticlesController < ApplicationController
 
   # GET /articles or /articles.json
   def index
-    @articles = Article.all
+    @search_query = params[:q].to_s
+    @selected_categories = Array(params[:categories]).map(&:to_sym)
+    @page = [ params[:page].to_i, 1 ].max
+
+    @articles = Articles::SearchKeywords.call(
+      search_query: @search_query,
+      categories: @selected_categories,
+      page: @page
+    )
+  rescue RuntimeError => e
+    flash.now[:alert] = e.message
+    @articles = []
   end
 
   # GET /articles/1 or /articles/1.json
