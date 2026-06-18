@@ -7,6 +7,8 @@ gem "propshaft"
 # Use sqlite3 as the database for Active Record
 gem "sqlite3", ">= 2.1"
 gem "sqlite-vec", "~> 0.1.9"
+# Use CSV for parsing CSV files [https://github.com/ruby/csv]
+gem "csv"
 # Use Neighbor for vector search [https://github.com/neighbor/neighbor]
 gem "neighbor"
 # Use the Puma web server [https://github.com/puma/puma]
