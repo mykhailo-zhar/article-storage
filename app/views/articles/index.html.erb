@@ -1,16 +1,58 @@
 <p style="color: green"><%= notice %></p>
+<% if flash[:alert].present? %>
+  <p style="color: red"><%= flash[:alert] %></p>
+<% end %>
 
 <% content_for :title, "Articles" %>
 
 <h1>Articles</h1>
 
+<%= form_with url: articles_path, method: :get, local: true do |form| %>
+  <div>
+    <%= label_tag :q, "What are you looking for?" %>
+    <%= text_field_tag :q, @search_query %>
+  </div>
+
+  <fieldset>
+    <legend>Categories</legend>
+    <% Articles::SearchKeywords::CATEGORIES_NAMES.each do |key, label| %>
+      <% next if key == :all %>
+      <div>
+        <%= radio_button_tag "categories[]", key, @selected_categories.include?(key), id: "categories_#{key}" %>
+        <%= label_tag "categories_#{key}", label %>
+      </div>
+    <% end %>
+  </fieldset>
+
+  <%= form.submit "Search" %>
+<% end %>
+
+<% if @articles.empty? && flash[:alert].blank? %>
+  <p>No articles found.</p>
+<% end %>
+
 <div id="articles">
   <% @articles.each do |article| %>
     <%= render article %>
-    <p>
-      <%= link_to "Show this article", article %>
-    </p>
   <% end %>
 </div>
 
-<%= link_to "New article", new_article_path %>
+<% if @page > 1 || @articles.size == 12 %>
+  <nav class="pagination" aria-label="Articles pagination">
+    <div class="pagination__controls">
+      <% if @page > 1 %>
+        <%= link_to "Previous",
+              articles_path(q: @search_query, categories: @selected_categories, page: @page - 1),
+              class: "pagination__button" %>
+      <% end %>
+
+      <span class="pagination__current">Page <%= @page %></span>
+
+      <% if @articles.size == 12 %>
+        <%= link_to "Next",
+              articles_path(q: @search_query, categories: @selected_categories, page: @page + 1),
+              class: "pagination__button" %>
+      <% end %>
+    </div>
+  </nav>
+<% end %>
