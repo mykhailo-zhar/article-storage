@@ -5,7 +5,7 @@ RSpec.describe "articles/show", type: :view do
     assign(:article, Article.create!(
       title: "Title",
       excerpt: "<p>MyText</p>",
-      wordpress_url: "Wordpress Url",
+      wordpress_url: "https://example.com/post",
       wordpress_id: 2
     ))
   end

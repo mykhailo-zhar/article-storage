@@ -36,6 +36,21 @@ RSpec.describe "articles/index", type: :view do
     assert_select "a.article__link[href=?]", "https://example.com/blog/building-a-saas-startup", text: "View the blog post"
   end
 
+  it "does not render a link for unsafe wordpress URLs" do
+    assign(:articles, [
+      Article.new(
+        title: "Unsafe Article",
+        excerpt: "<p>Excerpt</p>",
+        wordpress_url: "javascript:alert(1)",
+        published_at: DateTime.parse("2026-03-26T15:04:15")
+      )
+    ])
+
+    render
+
+    assert_select "a.article__link", count: 0
+  end
+
   it "renders a no-results message when articles are empty" do
     assign(:articles, [])
     assign(:search_query, "nothing")

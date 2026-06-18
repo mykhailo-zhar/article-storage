@@ -27,6 +27,8 @@
   </dl>
 
   <div class="article__actions">
-    <%= link_to "View the blog post", article.wordpress_url, target: "_blank", rel: "noopener", class: "article__link" %>
+    <% if (blog_url = UriSanitizerHelper.safe_external_url(article.wordpress_url)) %>
+      <%= link_to "View the blog post", blog_url, target: "_blank", rel: "noopener", class: "article__link" %>
+    <% end %>
   </div>
 </div>
