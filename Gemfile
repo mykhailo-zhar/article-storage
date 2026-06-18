@@ -78,3 +78,6 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+# Use Informers for LLM-powered code analysis [https://github.com/informers/informers]
+gem "informers", "~> 1.3"
