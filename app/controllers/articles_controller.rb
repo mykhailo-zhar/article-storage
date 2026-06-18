@@ -15,6 +15,11 @@ class ArticlesController < ApplicationController
       categories: @selected_categories,
       page: @page
     )
+
+    respond_to do |format|
+      format.html
+      format.json { render json: @articles }
+    end
   rescue RuntimeError => e
     flash.now[:alert] = e.message
     @articles = []
