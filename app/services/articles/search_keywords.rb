@@ -31,6 +31,8 @@ module Articles
                   :url,
                   :blog_url
 
+    attr_reader :total_pages
+
     def initialize(search_query: "",
                    categories: [],
                    page: 1,
@@ -57,6 +59,8 @@ module Articles
       unless response.is_a?(Net::HTTPSuccess) or response.is_a?(Net::HTTPRedirection)
         raise "WordPress API request failed (#{response.code}): #{response.body}"
       end
+
+      @total_pages = response.header["X-WP-TotalPages"].to_i
 
       process_response(parsed_body)
     end
