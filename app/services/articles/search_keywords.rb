@@ -6,22 +6,22 @@ module Articles
     STATUS = "publish,private"
 
     KEYWORDS_CATEGORIES = {
+      all: nil,
       idea: 881417,
       development: 718038516,
       extra_values: 718038291,
-      marketing: 15241,
-      all: nil
+      marketing: 15241
     }.freeze
 
     ID_TO_CATEGORY_NAMES = KEYWORDS_CATEGORIES.invert.freeze
 
 
     CATEGORIES_NAMES = {
+      all: "All",
       idea: "Idea",
       development: "Development stage",
       extra_values: "Extra values for startups",
-      marketing: "Marketing and product related topics",
-      all: "All"
+      marketing: "Marketing and product related topics"
     }.freeze
 
     attr_accessor :search_query,

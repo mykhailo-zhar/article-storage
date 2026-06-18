@@ -16,7 +16,6 @@
   <fieldset>
     <legend>Categories</legend>
     <% Articles::SearchKeywords::CATEGORIES_NAMES.each do |key, label| %>
-      <% next if key == :all %>
       <div>
         <%= radio_button_tag "categories[]", key, @selected_categories.include?(key), id: "categories_#{key}" %>
         <%= label_tag "categories_#{key}", label %>
