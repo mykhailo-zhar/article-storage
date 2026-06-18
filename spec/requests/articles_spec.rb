@@ -2,12 +2,61 @@ require 'rails_helper'
 
 RSpec.describe "/articles", type: :request do
   let(:article) { FactoryBot.create(:article) }
+  let(:search_result) do
+  [
+    Article.new(
+      title: "SaaS MVP Guide",
+      excerpt: "<p>Learn how to build a SaaS MVP.</p>",
+      wordpress_url: "https://example.com/blog/building-a-saas-startup",
+      wordpress_id: 17_396,
+      published_at: DateTime.parse("2026-03-26T15:04:15")
+    )
+  ]
+  end
 
   describe "GET /index" do
+    before do
+      allow(Articles::SearchKeywords).to receive(:call).and_return(search_result)
+    end
+
     it "renders a successful response" do
-      article
       get articles_url
       expect(response).to be_successful
+    end
+
+    it "calls SearchKeywords with search params" do
+      get articles_url, params: { q: "MVP", categories: [ "idea" ], page: "2" }
+
+      expect(Articles::SearchKeywords).to have_received(:call).with(
+        search_query: "MVP",
+        categories: [ :idea ],
+        page: 2
+      )
+    end
+
+    it "calls SearchKeywords with defaults when params are absent" do
+      get articles_url
+
+      expect(Articles::SearchKeywords).to have_received(:call).with(
+        search_query: "",
+        categories: [],
+        page: 1
+      )
+    end
+
+    context "when SearchKeywords raises an error" do
+      before do
+        allow(Articles::SearchKeywords).to receive(:call).and_raise(
+          RuntimeError, "WordPress API request failed (500): unavailable"
+        )
+      end
+
+      it "renders a successful response with an alert" do
+        get articles_url
+
+        expect(response).to be_successful
+        expect(response.body).to include("WordPress API request failed (500)")
+      end
     end
   end
 
