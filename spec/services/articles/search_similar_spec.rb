@@ -10,13 +10,17 @@ RSpec.describe Articles::SearchSimilar do
     let(:embedding_model) { double("embedding_model", call: query_embedding) }
 
     before do
+      stub_const("Articles::SearchSimilar::MIN_SIMILARITY_SCORE", 0)
       described_class.instance_variable_set(:@embedding_model, embedding_model)
     end
 
     it "returns an empty array when search_query is blank" do
       service = described_class.new(search_query: "")
 
-      expect(service.call).to eq([])
+      result = service.call
+
+      expect(result[:articles]).to eq([])
+      expect(result[:total_pages]).to eq(0)
     end
 
     it "returns persisted articles with categories loaded" do
@@ -25,9 +29,12 @@ RSpec.describe Articles::SearchSimilar do
 
       result = described_class.new(search_query: "MVP").call
 
-      expect(result).to eq([ article ])
-      expect(result.first.association(:categories)).to be_loaded
-      expect(result.first.categories).to contain_exactly(category)
+      first_article = result[:articles].first
+
+      expect(result[:articles]).to eq([ article ])
+      expect(first_article.association(:categories)).to be_loaded
+      expect(first_article.categories).to contain_exactly(category)
+      expect(result[:total_pages]).to eq(1)
     end
 
     it "orders results by cosine similarity" do
@@ -37,7 +44,8 @@ RSpec.describe Articles::SearchSimilar do
 
       result = described_class.new(search_query: "MVP").call
 
-      expect(result).to eq([ closest, middle, farthest ])
+      expect(result[:articles]).to eq([ closest, middle, farthest ])
+      expect(result[:total_pages]).to eq(1)
     end
 
     it "filters by category slug" do
@@ -48,7 +56,8 @@ RSpec.describe Articles::SearchSimilar do
 
       result = described_class.new(search_query: "MVP", categories: [ :idea ]).call
 
-      expect(result).to eq([ idea_article ])
+      expect(result[:articles]).to eq([ idea_article ])
+      expect(result[:total_pages]).to eq(1)
     end
 
     it "respects page and per_page" do
@@ -58,8 +67,9 @@ RSpec.describe Articles::SearchSimilar do
 
       result = described_class.new(search_query: "MVP", page: 2, per_page: 1).call
 
-      expect(result).to eq([ second ])
-      expect(result).not_to include(first)
+      expect(result[:articles]).to eq([ second ])
+      expect(result[:articles]).not_to include(first)
+      expect(result[:total_pages]).to eq(3)
     end
 
     it "embeds the search query" do
@@ -71,7 +81,8 @@ RSpec.describe Articles::SearchSimilar do
 
   describe ".call" do
     it "returns an empty array when search_query is blank" do
-      expect(described_class.call(search_query: "")).to eq([])
+      expect(described_class.call(search_query: "")[:articles]).to eq([])
+      expect(described_class.call(search_query: "")[:total_pages]).to eq(0)
     end
   end
 
@@ -88,28 +99,6 @@ RSpec.describe Articles::SearchSimilar do
       expect(service.categories).to eq([ :idea ])
       expect(service.page).to eq(2)
       expect(service.per_page).to eq(10)
-    end
-  end
-
-  describe "#resolved_categories" do
-    it "returns Category.none when categories are empty" do
-      service = described_class.new(categories: [])
-
-      expect(service.send(:resolved_categories)).to eq(Category.none)
-    end
-
-    it "returns Category.none when only :all is selected" do
-      service = described_class.new(categories: [ :all ])
-
-      expect(service.send(:resolved_categories)).to eq(Category.none)
-    end
-
-    it "returns matching Category records when slugs exist in the DB" do
-      idea = FactoryBot.create(:category, slug: "idea", name: "Idea")
-      FactoryBot.create(:category, slug: "marketing", name: "Marketing")
-      service = described_class.new(categories: [ :idea, :marketing ])
-
-      expect(service.send(:resolved_categories)).to contain_exactly(idea, Category.find_by!(slug: "marketing"))
     end
   end
 end

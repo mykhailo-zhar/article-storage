@@ -6,3 +6,15 @@ node = "22.13.1"
 [tasks.server]
 run = "bundle exec rails server"
 alias = "s"
+
+[tasks.debug]
+run = "bundle exec rdbg -O -n -c -- bin/rails server -p 3000"
+alias = "d"
+
+[tasks.console]
+run = "bundle exec rails console"
+alias = "c"
+
+[tasks.test]
+run = "bundle exec rspec"
+alias = "t"

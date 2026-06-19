@@ -3,6 +3,7 @@ module Articles
     include Callable
 
     EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+    MIN_SIMILARITY_SCORE = 0.15
 
     attr_accessor :search_query, :categories, :page, :per_page
     attr_reader :total_pages
@@ -15,20 +16,34 @@ module Articles
     end
 
     def call
-      return [] if search_query.blank?
-
       query_embedding = embed(search_query)
-      articles_scope
-        .nearest_neighbors(:embedding, query_embedding, distance: "cosine")
+
+      articles = articles_scope
+        .includes(:categories)
+
+      resolved_categories = categories&.map(&:to_s)&.reject { |slug| slug == "all" }
+      articles = articles.where(categories: { slug: resolved_categories }) if resolved_categories.any?
+
+      if query_embedding.present?
+        articles = articles
+        .nearest_neighbors(:embedding, query_embedding, distance: "cosine", threshold: 1.0 - MIN_SIMILARITY_SCORE)
+      end
+      total_articles = Article.from(articles.select(:id), :articles).count
+
+      articles_result = articles
         .limit(per_page)
         .offset(offset)
-        .includes(:categories)
         .to_a
+      {
+        articles: articles_result,
+        total_pages: (total_articles / per_page.to_f).ceil
+      }
     end
 
     private
 
     def embed(text)
+      return nil if text.blank?
       embedding_model.(text)
     end
 
@@ -38,26 +53,12 @@ module Articles
 
     def articles_scope
       scope = Article.where.not(embedding: nil)
-      categories = resolved_categories
-
-      if categories.exists?
-        scope = scope.joins(:article_categories)
-          .where(article_categories: { category_id: categories.select(:id) })
-          .distinct
-      end
 
       scope
     end
 
     def offset
       (page - 1) * per_page
-    end
-
-    def resolved_categories
-      slugs = Array(categories).map(&:to_s).reject { |slug| slug == "all" }
-      return Category.none if slugs.empty?
-
-      Category.where(slug: slugs)
     end
 
     class << self

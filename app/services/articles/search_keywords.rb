@@ -31,7 +31,6 @@ module Articles
                   :url,
                   :blog_url
 
-    attr_reader :total_pages
 
     def initialize(search_query: "",
                    categories: [],
@@ -54,36 +53,30 @@ module Articles
       parsed_body = JSON.parse(response.body)
 
       if response.code == "400" and parsed_body["code"] == "rest_post_invalid_page_number"
-        return []
+        return { articles: [], total_pages: 0 }
       end
       unless response.is_a?(Net::HTTPSuccess) or response.is_a?(Net::HTTPRedirection)
         raise "WordPress API request failed (#{response.code}): #{response.body}"
       end
 
-      @total_pages = response.header["X-WP-TotalPages"].to_i
-
-      process_response(parsed_body)
+      {
+        articles: process_response(parsed_body),
+        total_pages: response.header["X-WP-TotalPages"].to_i
+      }
     end
 
-    def process_response(parsed_articles)
-      parsed_articles.map do |article|
-          Article.new(
-            id: article["id"],
-            title: article["title"]["rendered"],
-            excerpt: article["excerpt"]["rendered"],
-            wordpress_url: URI.join(self.blog_url, article["slug"]).to_s,
-            wordpress_id: article["id"],
-            published_at: DateTime.parse(article["date"]),
-            categories: article["categories"].map do |category|
-              category_key = ID_TO_CATEGORY_NAMES.fetch(category, nil)
-              category_name = CATEGORIES_NAMES.fetch(category_key, nil)
-
-              Category.find_or_create_by(
-                wordpress_id: category,
-                name: category_name
-              ) if category_name.present?
-            end.compact
-          )
+    def process_response(parsed_body)
+      parsed_body.map do |article|
+        Article.new(
+          wordpress_id: article["id"],
+          title: article["title"]["rendered"],
+          excerpt: article["excerpt"]["rendered"],
+          wordpress_url: URI.join(self.blog_url, article["slug"]).to_s,
+          published_at: DateTime.parse(article["date"]),
+          categories: article["categories"].map do |category|
+            Category.find_or_create_by(wordpress_id: category, name: CATEGORIES_NAMES.fetch(ID_TO_CATEGORY_NAMES.fetch(category, nil), nil))
+          end
+        )
       end
     end
 

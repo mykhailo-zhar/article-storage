@@ -102,12 +102,12 @@ RSpec.describe Articles::SearchKeywords do
       it "returns a list of articles" do
         result = service.call
 
-        expect(result).to all(be_a(Article))
-        expect(result.size).to eq(1)
+        expect(result[:articles]).to all(be_a(Article))
+        expect(result[:articles].size).to eq(1)
       end
 
       it "maps WordPress fields onto each article" do
-        article = service.call.first
+        article = service.call[:articles].first
 
         expect(article.wordpress_id).to eq(17_396)
         expect(article.title).to eq("SaaS MVP: Building a SaaS Startup in 2026 Guide")
@@ -117,7 +117,7 @@ RSpec.describe Articles::SearchKeywords do
       end
 
       it "resolves categories from WordPress IDs" do
-        article = service.call.first
+        article = service.call[:articles].first
 
         expect(article.categories.map(&:wordpress_id)).to eq([ 881_417 ])
         expect(article.categories.map(&:name)).to eq([ "Idea" ])
@@ -130,7 +130,7 @@ RSpec.describe Articles::SearchKeywords do
       end
 
       it "returns an empty list" do
-        expect(service.call).to eq([])
+        expect(service.call[:articles]).to eq([])
       end
     end
 
@@ -140,7 +140,7 @@ RSpec.describe Articles::SearchKeywords do
       end
 
       it "returns an empty list" do
-        expect(service.call).to eq([])
+        expect(service.call[:articles]).to eq([])
       end
     end
 
@@ -150,7 +150,7 @@ RSpec.describe Articles::SearchKeywords do
       end
 
       it "raises an error" do
-        expect { service.call }.to raise_error(
+        expect { service.call[:articles] }.to raise_error(
           RuntimeError,
           /WordPress API request failed \(500\)/
         )

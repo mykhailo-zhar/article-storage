@@ -4,6 +4,7 @@ RSpec.describe "articles/index", type: :view do
   before(:each) do
     assign(:search_query, "MVP")
     assign(:selected_categories, [ :idea ])
+    assign(:type, :keywords)
     assign(:page, 1)
     category = Category.create!(name: "Idea", wordpress_id: 881_417)
     assign(:articles, [
@@ -23,6 +24,8 @@ RSpec.describe "articles/index", type: :view do
 
     assert_select "form[action=?][method=get]", articles_path
     assert_select "input[name=search][value=?]", "MVP"
+    assert_select "input[name=type][checked=checked][value=keywords]"
+    assert_select "input[name=type][value=similar]"
     assert_select "input[name='categories[]'][checked=checked][value=idea]"
     assert_select "input[type=submit][value=?]", "Search"
   end
@@ -76,6 +79,7 @@ RSpec.describe "articles/index", type: :view do
     assert_select "form.pagination__page-form[action=?][method=get]", articles_path
     assert_select "input[name=search][value=?]", "MVP"
     assert_select "input[name='categories[]'][value=idea]"
+    assert_select "input[name=type][value=keywords]"
     assert_select "input#page[name=page][type=number][value=?]", "1"
     assert_select "input#page[min=?]", "1"
     assert_select "input#page[max=?]", "3"

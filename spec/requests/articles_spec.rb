@@ -3,28 +3,31 @@ require 'rails_helper'
 RSpec.describe "/articles", type: :request do
   let(:article) { FactoryBot.create(:article) }
   let(:search_result) do
-  [
-    Article.new(
-      title: "SaaS MVP Guide",
-      excerpt: "<p>Learn how to build a SaaS MVP.</p>",
-      wordpress_url: "https://example.com/blog/building-a-saas-startup",
-      wordpress_id: 17_396,
-      published_at: DateTime.parse("2026-03-26T15:04:15")
-    )
-  ]
+  {
+    articles: [
+      Article.new(
+        title: "SaaS MVP Guide",
+        excerpt: "<p>Learn how to build a SaaS MVP.</p>",
+        wordpress_url: "https://example.com/blog/building-a-saas-startup",
+        wordpress_id: 17_396,
+        published_at: DateTime.parse("2026-03-26T15:04:15")
+      )
+    ],
+    total_pages: 3
+  }
   end
 
   let(:search_service) do
     instance_double(
-      Articles::SearchKeywords,
+      Articles::SearchFactory,
       call: search_result,
-      total_pages: 3
+      type: :keywords
     )
   end
 
-  describe "GET /index" do
+  describe "GET /index with keywords" do
     before do
-      allow(Articles::SearchKeywords).to receive(:new).and_return(search_service)
+      allow(Articles::SearchFactory).to receive(:new).and_return(search_service)
     end
 
     it "renders a successful response" do
@@ -35,20 +38,22 @@ RSpec.describe "/articles", type: :request do
     it "calls SearchKeywords with search params" do
       get articles_url, params: { search: "MVP", categories: [ "idea" ], page: "2" }
 
-      expect(Articles::SearchKeywords).to have_received(:new).with(
+      expect(Articles::SearchFactory).to have_received(:new).with(
         search_query: "MVP",
         categories: [ :idea ],
-        page: 2
+        page: 2,
+        type: :keywords
       )
     end
 
     it "calls SearchKeywords with defaults when params are absent" do
       get articles_url
 
-      expect(Articles::SearchKeywords).to have_received(:new).with(
+      expect(Articles::SearchFactory).to have_received(:new).with(
         search_query: "",
         categories: [],
-        page: 1
+        page: 1,
+        type: :keywords
       )
     end
 
