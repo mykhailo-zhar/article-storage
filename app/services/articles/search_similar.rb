@@ -18,11 +18,16 @@ module Articles
       return [] if search_query.blank?
 
       query_embedding = embed(search_query)
-      articles_scope
-        .nearest_neighbors(:embedding, query_embedding, distance: "cosine")
+      articles = articles_scope
+        .includes(:categories)
+
+      articles = articles.where(categories: { slug: categories }) if categories.present?
+
+      @total_pages = (articles.count / per_page).ceil
+
+      articles.nearest_neighbors(:embedding, query_embedding, distance: "cosine")
         .limit(per_page)
         .offset(offset)
-        .includes(:categories)
         .to_a
     end
 
