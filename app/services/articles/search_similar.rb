@@ -15,25 +15,28 @@ module Articles
     end
 
     def call
-      return [] if search_query.blank?
-
       query_embedding = embed(search_query)
+
       articles = articles_scope
         .includes(:categories)
 
       articles = articles.where(categories: { slug: categories }) if categories.present?
+      articles = articles.nearest_neighbors(:embedding, query_embedding, distance: "cosine") if query_embedding.present?
 
-      @total_pages = (articles.count / per_page).ceil
-
-      articles.nearest_neighbors(:embedding, query_embedding, distance: "cosine")
+      articles_result = articles
         .limit(per_page)
         .offset(offset)
         .to_a
+      {
+        articles: articles_result,
+        total_pages: (articles_result.count / per_page.to_f).ceil
+      }
     end
 
     private
 
     def embed(text)
+      return nil if text.blank?
       embedding_model.(text)
     end
 

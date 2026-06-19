@@ -3,22 +3,24 @@ require 'rails_helper'
 RSpec.describe "/articles", type: :request do
   let(:article) { FactoryBot.create(:article) }
   let(:search_result) do
-  [
-    Article.new(
-      title: "SaaS MVP Guide",
-      excerpt: "<p>Learn how to build a SaaS MVP.</p>",
-      wordpress_url: "https://example.com/blog/building-a-saas-startup",
-      wordpress_id: 17_396,
-      published_at: DateTime.parse("2026-03-26T15:04:15")
-    )
-  ]
+  {
+    articles: [
+      Article.new(
+        title: "SaaS MVP Guide",
+        excerpt: "<p>Learn how to build a SaaS MVP.</p>",
+        wordpress_url: "https://example.com/blog/building-a-saas-startup",
+        wordpress_id: 17_396,
+        published_at: DateTime.parse("2026-03-26T15:04:15")
+      )
+    ],
+    total_pages: 3
+  }
   end
 
   let(:search_service) do
     instance_double(
       Articles::SearchFactory,
       call: search_result,
-      total_pages: 3,
       type: :keywords
     )
   end

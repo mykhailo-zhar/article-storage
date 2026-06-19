@@ -11,15 +11,15 @@ class ArticlesController < ApplicationController
     @page = [ params[:page].to_i, 1 ].max
     @type = params[:type]&.to_sym || :keywords
 
-    search_service = Articles::SearchFactory.new(
+    result = Articles::SearchFactory.call(
       search_query: @search_query,
       categories: @selected_categories,
       page: @page,
       type: @type
     )
 
-    @articles = search_service.call
-    @total_pages = search_service.total_pages
+    @articles = result[:articles]
+    @total_pages = result[:total_pages]
 
     respond_to do |format|
       format.html

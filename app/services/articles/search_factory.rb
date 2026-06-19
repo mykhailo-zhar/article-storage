@@ -5,8 +5,6 @@ module Articles
 
     attr_accessor :search_query, :categories, :page, :per_page, :type
 
-    attr_reader :total_pages
-
 
     def initialize(search_query: "", categories: [], page: 1, per_page: 12, type: :keywords)
       self.search_query = search_query
@@ -20,7 +18,6 @@ module Articles
       service = service_for(type)
 
       result = service.call
-      @total_pages = service.total_pages
       result
     end
 
