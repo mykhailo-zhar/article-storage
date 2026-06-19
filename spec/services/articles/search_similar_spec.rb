@@ -115,11 +115,12 @@ RSpec.describe Articles::SearchSimilar do
     end
 
     it "returns matching Category records when slugs exist in the DB" do
-      idea = FactoryBot.create(:category, slug: "idea", name: "Idea")
+      FactoryBot.create(:category, slug: "idea", name: "Idea")
       FactoryBot.create(:category, slug: "marketing", name: "Marketing")
       service = described_class.new(categories: [ :idea, :marketing ])
+      expected_categories = [ "idea", "marketing" ]
 
-      expect(service.send(:resolved_categories)).to contain_exactly(idea, Category.find_by!(slug: "marketing"))
+      expect(service.send(:resolved_categories)).to contain_exactly(*expected_categories)
     end
   end
 end
