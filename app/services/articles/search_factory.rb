@@ -2,6 +2,10 @@ module Articles
   class SearchFactory
     include Callable
 
+    TYPES = {
+      keywords: "Keyword search",
+      similar: "Similar articles"
+    }.freeze
 
     attr_accessor :search_query, :categories, :page, :per_page, :type
 
