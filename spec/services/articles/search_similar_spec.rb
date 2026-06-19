@@ -100,27 +100,4 @@ RSpec.describe Articles::SearchSimilar do
       expect(service.per_page).to eq(10)
     end
   end
-
-  describe "#resolved_categories" do
-    it "returns Category.none when categories are empty" do
-      service = described_class.new(categories: [])
-
-      expect(service.send(:resolved_categories)).to eq(Category.none)
-    end
-
-    it "returns Category.none when only :all is selected" do
-      service = described_class.new(categories: [ :all ])
-
-      expect(service.send(:resolved_categories)).to eq(Category.none)
-    end
-
-    it "returns matching Category records when slugs exist in the DB" do
-      FactoryBot.create(:category, slug: "idea", name: "Idea")
-      FactoryBot.create(:category, slug: "marketing", name: "Marketing")
-      service = described_class.new(categories: [ :idea, :marketing ])
-      expected_categories = [ "idea", "marketing" ]
-
-      expect(service.send(:resolved_categories)).to contain_exactly(*expected_categories)
-    end
-  end
 end

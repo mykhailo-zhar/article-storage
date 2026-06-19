@@ -20,7 +20,9 @@ module Articles
       articles = articles_scope
         .includes(:categories)
 
-      articles = articles.where(categories: { slug: categories }) if categories.present?
+      resolved_categories = categories&.map(&:to_s)&.reject { |slug| slug == "all" }
+      articles = articles.where(categories: { slug: resolved_categories }) if resolved_categories.any?
+
       articles = articles.nearest_neighbors(:embedding, query_embedding, distance: "cosine") if query_embedding.present?
 
       articles_result = articles
@@ -46,26 +48,12 @@ module Articles
 
     def articles_scope
       scope = Article.where.not(embedding: nil)
-      categories = resolved_categories
-
-      if categories.exists?
-        scope = scope.joins(:article_categories)
-          .where(article_categories: { category_id: categories.select(:id) })
-          .distinct
-      end
 
       scope
     end
 
     def offset
       (page - 1) * per_page
-    end
-
-    def resolved_categories
-      slugs = Array(categories).map(&:to_s).reject { |slug| slug == "all" }
-      return Category.none if slugs.empty?
-
-      Category.where(slug: slugs)
     end
 
     class << self
