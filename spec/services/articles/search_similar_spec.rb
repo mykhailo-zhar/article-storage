@@ -10,6 +10,7 @@ RSpec.describe Articles::SearchSimilar do
     let(:embedding_model) { double("embedding_model", call: query_embedding) }
 
     before do
+      stub_const("Articles::SearchSimilar::MIN_SIMILARITY_SCORE", 0)
       described_class.instance_variable_set(:@embedding_model, embedding_model)
     end
 
@@ -68,7 +69,7 @@ RSpec.describe Articles::SearchSimilar do
 
       expect(result[:articles]).to eq([ second ])
       expect(result[:articles]).not_to include(first)
-      expect(result[:total_pages]).to eq(1)
+      expect(result[:total_pages]).to eq(3)
     end
 
     it "embeds the search query" do

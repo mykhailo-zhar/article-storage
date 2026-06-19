@@ -3,6 +3,7 @@ module Articles
     include Callable
 
     EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+    MIN_SIMILARITY_SCORE = 0.15
 
     attr_accessor :search_query, :categories, :page, :per_page
     attr_reader :total_pages
@@ -23,7 +24,11 @@ module Articles
       resolved_categories = categories&.map(&:to_s)&.reject { |slug| slug == "all" }
       articles = articles.where(categories: { slug: resolved_categories }) if resolved_categories.any?
 
-      articles = articles.nearest_neighbors(:embedding, query_embedding, distance: "cosine") if query_embedding.present?
+      if query_embedding.present?
+        articles = articles
+        .nearest_neighbors(:embedding, query_embedding, distance: "cosine", threshold: 1.0 - MIN_SIMILARITY_SCORE)
+      end
+      total_articles = Article.from(articles.select(:id), :articles).count
 
       articles_result = articles
         .limit(per_page)
@@ -31,7 +36,7 @@ module Articles
         .to_a
       {
         articles: articles_result,
-        total_pages: (articles_result.count / per_page.to_f).ceil
+        total_pages: (total_articles / per_page.to_f).ceil
       }
     end
 
