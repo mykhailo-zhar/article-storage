@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_18_105453) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_22_101129) do
   create_table "article_categories", force: :cascade do |t|
     t.integer "article_id", null: false
     t.integer "category_id", null: false
@@ -23,6 +23,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_18_105453) do
 
   create_table "articles", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.text "description"
     t.binary "embedding", limit: 384
     t.text "excerpt"
     t.datetime "published_at"
