@@ -20,15 +20,25 @@ class ArticlesController < ApplicationController
 
     @articles = result[:articles]
     @total_pages = result[:total_pages]
-
-    respond_to do |format|
-      format.html
-      format.json { render json: { articles: @articles, total_pages: @total_pages } }
-    end
   rescue RuntimeError => e
     flash.now[:alert] = e.message
     @articles = []
     @total_pages = 0
+  ensure
+    @presenter = Articles::ArticlesPresenter.new(
+      articles: @articles,
+      search_query: @search_query,
+      type: @type,
+      selected_categories: @selected_categories,
+      page: @page,
+      total_pages: @total_pages,
+      context: self
+    )
+
+    respond_to do |format|
+      format.html { render :index }
+      format.json { render json: @presenter }
+    end
   end
 
   # GET /articles/1 or /articles/1.json
