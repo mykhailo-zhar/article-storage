@@ -21,8 +21,15 @@ module Articles
       articles = articles_scope
         .includes(:categories)
 
-      resolved_categories = categories&.map(&:to_s)&.reject { |slug| slug == "all" }
-      articles = articles.where(categories: { slug: resolved_categories }) if resolved_categories.any?
+      resolved_categories = Category.where(id: categories)&.pluck(:id)
+      if resolved_categories.any?
+        # Articles having exactly all the resolved_categories
+        articles = articles
+          .joins(:article_categories)
+          .where(article_categories: { category_id: resolved_categories })
+          .group("articles.id")
+          .having("COUNT(DISTINCT article_categories.category_id) = ?", resolved_categories.size)
+      end
 
       if query_embedding.present?
         articles = articles
