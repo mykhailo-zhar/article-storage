@@ -42,3 +42,7 @@ mise.local.toml
 
 # Ignore key files for decrypting credentials and more.
 /config/*.key
+
+# Ignore vendor files.
+/vendor/*
+!/vendor/.keep
