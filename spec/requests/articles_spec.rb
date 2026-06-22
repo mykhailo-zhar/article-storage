@@ -2,6 +2,8 @@ require 'rails_helper'
 
 RSpec.describe "/articles", type: :request do
   let(:article) { FactoryBot.create(:article) }
+  let(:parent) { FactoryBot.create(:category, name: "Parent", slug: "parent") }
+  let(:category) { FactoryBot.create(:category, name: "Idea", slug: "idea", parent: parent) }
   let(:search_result) do
   {
     articles: [
@@ -10,7 +12,8 @@ RSpec.describe "/articles", type: :request do
         excerpt: "<p>Learn how to build a SaaS MVP.</p>",
         wordpress_url: "https://example.com/blog/building-a-saas-startup",
         wordpress_id: 17_396,
-        published_at: DateTime.parse("2026-03-26T15:04:15")
+        published_at: DateTime.parse("2026-03-26T15:04:15"),
+        categories: [ category ]
       )
     ],
     total_pages: 3
@@ -35,16 +38,25 @@ RSpec.describe "/articles", type: :request do
       expect(response).to be_successful
     end
 
-    it "calls SearchKeywords with search params" do
-      get articles_url, params: { search: "MVP", categories: [ "idea" ], page: "2" }
+    context "with categories" do
+      let(:params) do
+        result = { search: "MVP", page: "2" }
+        result["categories_#{category.parent.id}".to_sym] = [ category.id ]
+        result
+      end
+      it "calls SearchKeywords with search params" do
+        get articles_url, params: params
 
-      expect(Articles::SearchFactory).to have_received(:new).with(
-        search_query: "MVP",
-        categories: [ :idea ],
-        page: 2,
-        type: :keywords
-      )
+        expect(Articles::SearchFactory).to have_received(:new).with(
+          search_query: "MVP",
+          categories: [ category.id ],
+          page: 2,
+          type: :keywords
+        )
+      end
     end
+
+
 
     it "calls SearchKeywords with defaults when params are absent" do
       get articles_url
