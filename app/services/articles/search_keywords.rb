@@ -5,25 +5,6 @@ module Articles
     FIELDS = "id,date,slug,title.rendered,excerpt.rendered,jetpack_featured_media_url,categories"
     STATUS = "publish,private"
 
-    KEYWORDS_CATEGORIES = {
-      all: nil,
-      idea: 881417,
-      development: 718038516,
-      extra_values: 718038291,
-      marketing: 15241
-    }.freeze
-
-    ID_TO_CATEGORY_NAMES = KEYWORDS_CATEGORIES.invert.freeze
-
-
-    CATEGORIES_NAMES = {
-      all: "All",
-      idea: "Idea",
-      development: "Development stage",
-      extra_values: "Extra values for startups",
-      marketing: "Marketing and product related topics"
-    }.freeze
-
     attr_accessor :search_query,
                   :categories,
                   :page,
@@ -73,9 +54,7 @@ module Articles
           excerpt: article["excerpt"]["rendered"],
           wordpress_url: URI.join(self.blog_url, article["slug"]).to_s,
           published_at: DateTime.parse(article["date"]),
-          categories: article["categories"].map do |category|
-            Category.find_or_create_by(wordpress_id: category, name: CATEGORIES_NAMES.fetch(ID_TO_CATEGORY_NAMES.fetch(category, nil), nil))
-          end
+          categories: Category.where(wordpress_id: article["categories"])
         )
       end
     end
@@ -104,7 +83,7 @@ module Articles
     end
 
     def resolved_category_ids
-      Array(categories).map { |category| KEYWORDS_CATEGORIES.fetch(category, category) }
+      Category.where(id: Array(categories)).pluck(:wordpress_id)
     end
   end
 end
