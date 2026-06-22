@@ -25,4 +25,7 @@ class Category < ApplicationRecord
 
   has_many :article_categories, dependent: :destroy
   has_many :articles, through: :article_categories
+
+  scope :for_search_keywords, -> { includes(:parent).where(parent_id: 5) }
+  scope :for_search_similar, -> { includes(:parent).where(parent_id: [ 5, 1000 ]) }
 end
