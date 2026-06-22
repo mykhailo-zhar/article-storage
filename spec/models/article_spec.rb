@@ -3,6 +3,7 @@
 # Table name: articles
 #
 #  id            :integer          not null, primary key
+#  description   :text
 #  embedding     :binary(384)
 #  excerpt       :text
 #  published_at  :datetime
