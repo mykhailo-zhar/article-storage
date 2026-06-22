@@ -48,13 +48,13 @@ RSpec.describe Articles::SearchSimilar do
       expect(result[:total_pages]).to eq(1)
     end
 
-    it "filters by category slug" do
+    it "filters by category id" do
       idea = FactoryBot.create(:category, slug: "idea", name: "Idea")
       marketing = FactoryBot.create(:category, slug: "marketing", name: "Marketing")
       idea_article = FactoryBot.create(:article, title: "Idea article", embedding: unit_vector(0), categories: [ idea ])
       FactoryBot.create(:article, title: "Marketing article", embedding: unit_vector(1), categories: [ marketing ])
 
-      result = described_class.new(search_query: "MVP", categories: [ :idea ]).call
+      result = described_class.new(search_query: "MVP", categories: [ idea.id ]).call
 
       expect(result[:articles]).to eq([ idea_article ])
       expect(result[:total_pages]).to eq(1)

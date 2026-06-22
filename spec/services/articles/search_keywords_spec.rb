@@ -3,10 +3,11 @@ require "rails_helper"
 RSpec.describe Articles::SearchKeywords do
   let(:api_url) { "https://example.com/api/blog-posts" }
   let(:blog_url) { "https://example.com/blog/" }
+  let(:category) { FactoryBot.create(:category, name: "Idea", slug: "idea", wordpress_id: 881_417) }
   let(:service) do
     described_class.new(
       search_query: "MVP",
-      categories: [ :idea ],
+      categories: [ category.id ],
       page: 1,
       per_page: 12,
       url: api_url,
@@ -55,7 +56,7 @@ RSpec.describe Articles::SearchKeywords do
     it "includes categories in the request when categories are present" do
       service = described_class.new(
         search_query: "MVP",
-        categories: [ :idea ],
+        categories: [ category.id ],
         url: api_url,
         blog_url: blog_url
       )

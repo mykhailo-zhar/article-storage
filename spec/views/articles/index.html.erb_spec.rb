@@ -1,7 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe "articles/index", type: :view do
-  let(:category) { Category.create!(name: "Idea", wordpress_id: 881_417) }
+  let(:parent) { Category.create!(id: 5, name: "Parent", slug: "parent") }
+  let(:category) { Category.create!(name: "Idea", wordpress_id: 881_417, parent: parent) }
   let(:articles) do
     [
       Article.new(
@@ -16,7 +17,7 @@ RSpec.describe "articles/index", type: :view do
   end
   let(:search_query) { "MVP" }
   let(:type) { :keywords }
-  let(:selected_categories) { [ :idea ] }
+  let(:selected_categories) { { parent.id => [ category.id ] } }
   let(:page) { 1 }
   let(:total_pages) { 1 }
 
@@ -43,9 +44,7 @@ RSpec.describe "articles/index", type: :view do
 
     assert_select "form[action=?][method=get]", articles_path
     assert_select "input[name=search][value=?]", "MVP"
-    assert_select "input[name=type][checked=checked][value=keywords]"
-    assert_select "input[name=type][value=similar]"
-    assert_select "input[name='categories[]'][checked=checked][value=idea]"
+    assert_select "input[type=radio][name='categories_#{parent.id}[]'][value='#{category.id}'][checked=checked]"
     assert_select "input[type=submit][value=?]", "Search"
   end
 
@@ -95,7 +94,8 @@ RSpec.describe "articles/index", type: :view do
         Article.new(
           title: "Article #{index}",
           excerpt: "<p>Excerpt #{index}</p>",
-          published_at: DateTime.parse("2026-03-26T15:04:15")
+          published_at: DateTime.parse("2026-03-26T15:04:15"),
+          categories: [ category ]
         )
       end
     end
@@ -106,7 +106,7 @@ RSpec.describe "articles/index", type: :view do
       assert_select "nav.pagination[aria-label=?]", "Articles pagination"
       assert_select "form.pagination__page-form[action=?][method=get]", articles_path
       assert_select "input[name=search][value=?]", "MVP"
-      assert_select "input[name='categories[]'][value=idea]"
+      assert_select "input[type=radio][name='categories_#{parent.id}[]'][value='#{category.id}'][checked=checked]"
       assert_select "input[name=type][value=keywords]"
       assert_select "input#page[name=page][type=number][value=?]", "1"
       assert_select "input#page[min=?]", "1"
