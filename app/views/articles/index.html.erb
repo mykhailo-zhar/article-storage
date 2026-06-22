@@ -13,15 +13,7 @@
     <%= text_field_tag :search, @presenter.search_query %>
   </div>
 
-  <fieldset>
-    <legend>Search type</legend>
-    <% Articles::SearchFactory::TYPES.each do |key, label| %>
-      <div>
-        <%= radio_button_tag :type, key, @type == key, id: "type_#{key}" %>
-        <%= label_tag "type_#{key}", label %>
-      </div>
-    <% end %>
-  </fieldset>
+  <%= hidden_field_tag :type, @presenter.type %>
 
   <fieldset>
     <legend>Categories</legend>
