@@ -6,6 +6,18 @@ RSpec.describe ArticlesController, type: :routing do
       expect(get: "/articles").to route_to("articles#index")
     end
 
+    it "routes root to #index" do
+      expect(get: "/").to route_to("articles#index")
+    end
+
+    it "routes keywords collection to #index" do
+      expect(get: "/articles/keywords").to route_to("articles#index", type: :keywords)
+    end
+
+    it "routes similar collection to #index" do
+      expect(get: "/articles/similar").to route_to("articles#index", type: :similar)
+    end
+
     it "routes to #new" do
       expect(get: "/articles/new").to route_to("articles#new")
     end

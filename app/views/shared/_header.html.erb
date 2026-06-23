@@ -1,0 +1,11 @@
+<header class="site-header">
+  <div class="site-header__inner">
+    <%= link_to "Article Storage", root_path, class: "site-header__brand" %>
+
+    <nav class="site-nav" aria-label="Search">
+      <% ApplicationHelper::SEARCH_NAV_TYPES.each do |type, label| %>
+        <%= link_to label, search_nav_path(type), class: search_nav_link_class(type) %>
+      <% end %>
+    </nav>
+  </div>
+</header>
