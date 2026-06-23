@@ -1,3 +1,5 @@
+require "net/http"
+
 module Articles
   class SearchKeywords
     include Callable
