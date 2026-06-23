@@ -7,10 +7,10 @@
 
 <h1>Articles</h1>
 
-<%= form_with url: articles_path, method: :get, local: true do |form| %>
-  <div>
-    <%= label_tag :search, "What are you looking for?" %>
-    <%= text_field_tag :search, @presenter.search_query %>
+<%= form_with url: articles_path, method: :get, local: true, class: "search-form" do |form| %>
+  <div class="search-form__query">
+    <%= text_field_tag :search, @presenter.search_query, placeholder: "What are you looking for?", class: "search-form__input" %>
+    <%= submit_tag "Search", class: "button" %>
   </div>
 
   <%= hidden_field_tag :type, @presenter.type %>
@@ -18,7 +18,8 @@
   <fieldset>
     <legend>Categories</legend>
     <% @presenter.categories.each do |parent, categories| %>
-      <%= label_tag "categories_#{parent.id}", parent.name %>
+      <div class="search-form__categories">
+      <%= label_tag "categories_#{parent.id}", parent.name, class: "category-label" %>
       <div>
       <%= radio_button_tag "categories_#{parent.id}[]", "", @presenter.selected_categories.fetch(parent.id, []).empty?, id: "categories_#{parent.id}_all" %>
       <%= label_tag "categories_#{parent.id}_all", "All" %>
@@ -29,10 +30,10 @@
           <%= label_tag "categories_#{category.id}", category.name %>
         </div>
       <% end %>
+      </div>
     <% end %>
   </fieldset>
 
-  <%= form.submit "Search" %>
 <% end %>
 
 <% if @presenter.no_articles? %>
