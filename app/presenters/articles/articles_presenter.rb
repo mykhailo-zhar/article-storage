@@ -19,7 +19,7 @@ module Articles
     end
 
     def no_articles?
-      articles.empty? && context.flash[:alert].blank?
+      articles&.empty? && context.flash[:alert].blank?
     end
 
     def navigation_enabled?
