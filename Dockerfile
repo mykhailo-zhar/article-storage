@@ -54,8 +54,10 @@ RUN bundle exec bootsnap precompile -j 1 app/ lib/
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
-
-
+# Download embedding model into the image (used by similar search)
+ENV XDG_CACHE_HOME=/rails/tmp/cache
+RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails runner \
+  "Articles::SearchSimilar.embedding_model"
 
 # Final stage for app image
 FROM base
