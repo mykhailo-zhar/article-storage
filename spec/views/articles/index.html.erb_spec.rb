@@ -42,10 +42,10 @@ RSpec.describe "articles/index", type: :view do
   it "renders the search form" do
     render
 
-    assert_select "form[action=?][method=get]", articles_path
-    assert_select "input[name=search][value=?]", "MVP"
+    assert_select "form.search-form[action=?][method=get]", articles_path
+    assert_select "input.search-form__input[name=search][value=?]", "MVP"
     assert_select "input[type=radio][name='categories_#{parent.id}[]'][value='#{category.id}'][checked=checked]"
-    assert_select "input[type=submit][value=?]", "Search"
+    assert_select "input.button[type=submit][value=?]", "Search"
   end
 
   it "renders article results with a WordPress link" do
